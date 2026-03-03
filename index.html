@@ -26,7 +26,10 @@
       <h1 class="site-title">
         <span class="accent">ECCベストワン</span> Webアプリランチャー
       </h1>
-      <button class="lock-btn" id="lockBtn" title="ロック/アンロック">🔒</button>
+      <div class="header-actions">
+        <button class="settings-btn" id="settingsBtn" style="display:none" title="設定">⚙️</button>
+        <button class="lock-btn" id="lockBtn" title="ロック/アンロック">🔒</button>
+      </div>
     </div>
     <p class="site-subtitle">── アプリを整理・管理・起動 ──</p>
   </header>
@@ -82,10 +85,10 @@
     <div class="context-menu-item danger" id="ctxDelete">🗑️ 削除</div>
   </div>
 
-  <!-- Modal: Password -->
+  <!-- Modal: Password (Login) -->
   <div class="modal-backdrop" id="passwordModal">
     <div class="modal-panel" style="max-width:360px;">
-      <h2 class="modal-title">🔐 パスワード入力</h2>
+      <h2 class="modal-title">🔐 ログイン</h2>
       <form id="passwordForm">
         <div class="modal-field">
           <label for="inputPassword">パスワードを入力してください</label>
@@ -93,10 +96,24 @@
         </div>
         <div id="pwError" style="color:#ef5350;font-size:0.85rem;margin-bottom:12px;display:none;">パスワードが正しくありません</div>
         <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" id="btnPwCancel">キャンセル</button>
-          <button type="submit" class="btn btn-primary">解除</button>
+          <button type="submit" class="btn btn-primary" style="width:100%">ログイン</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal: Settings (master + local only) -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal-panel" style="max-width:560px;">
+      <h2 class="modal-title">⚙️ 設定</h2>
+      <div id="settingsContent">
+        <!-- Built by JS -->
+      </div>
+      <div class="modal-actions" style="margin-top:20px;">
+        <button type="button" class="btn btn-secondary" id="btnSettingsExport">📤 エクスポート</button>
+        <button type="button" class="btn btn-secondary" id="btnSettingsClose">閉じる</button>
+        <button type="button" class="btn btn-primary" id="btnSettingsSave">保存</button>
+      </div>
     </div>
   </div>
 

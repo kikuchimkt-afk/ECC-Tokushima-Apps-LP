@@ -1,0 +1,39 @@
+{
+  "roles": [
+    {
+      "name": "master",
+      "label": "マスター",
+      "password": "54834646",
+      "categories": "*"
+    },
+    {
+      "name": "staff",
+      "label": "一般スタッフ",
+      "password": "11223344",
+      "categories": [
+        "counter",
+        "learning",
+        "mini",
+        "database"
+      ]
+    },
+    {
+      "name": "external",
+      "label": "外部",
+      "password": "55667788",
+      "categories": [
+        "learning",
+        "database",
+        "mini"
+      ]
+    },
+    {
+      "name": "student",
+      "label": "生徒",
+      "password": "99887766",
+      "categories": [
+        "learning"
+      ]
+    }
+  ]
+}

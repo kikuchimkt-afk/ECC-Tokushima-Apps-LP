@@ -7,9 +7,21 @@
 
     // ---------- Auth Check ----------
     const AUTH_KEY = 'lp_authenticated';
+    const AUTH_CATS_KEY = 'lp_auth_cats';
     if (localStorage.getItem(AUTH_KEY) !== 'true') {
         window.location.href = 'index.html';
         return;
+    }
+    // Role-based category access check
+    const urlCatId = new URLSearchParams(window.location.search).get('cat') || '';
+    const allowedCats = localStorage.getItem(AUTH_CATS_KEY);
+    if (allowedCats && allowedCats !== '*') {
+        const cats = JSON.parse(allowedCats);
+        if (!cats.includes(urlCatId)) {
+            alert('このカテゴリへのアクセス権限がありません');
+            window.location.href = 'index.html';
+            return;
+        }
     }
 
     // ---------- Local Check ----------
