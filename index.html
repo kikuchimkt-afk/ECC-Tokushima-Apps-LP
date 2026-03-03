@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="学習塾 Webアプリ ランチャー - カウンターツール・学習アプリ・経理ツール・ミニアプリを一元管理" />
+  <title>ECCベストワン Webアプリ ランチャー</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- Background -->
+  <div class="bg-container">
+    <img src="images/bg.png" alt="Background" />
+  </div>
+  <div class="bg-overlay"></div>
+
+  <!-- Floating Particles -->
+  <div class="particles-container" id="particles"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-top">
+      <h1 class="site-title">
+        <span class="accent">ECCベストワン</span> Webアプリランチャー
+      </h1>
+      <button class="lock-btn" id="lockBtn" title="ロック/アンロック">🔒</button>
+    </div>
+    <p class="site-subtitle">── アプリを整理・管理・起動 ──</p>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="category-grid" id="categoryGrid">
+      <!-- Rendered by JS -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    &copy; 2026 ECCベストワン藍住・北島中央
+  </footer>
+
+  <!-- Modal: Add/Edit Category -->
+  <div class="modal-backdrop" id="categoryModal">
+    <div class="modal-panel">
+      <h2 class="modal-title" id="modalTitle">新規カテゴリ追加</h2>
+      <form id="categoryForm">
+        <div class="modal-field">
+          <label for="inputTitle">カテゴリ名</label>
+          <input type="text" id="inputTitle" placeholder="例: カウンターツール" required />
+        </div>
+        <div class="modal-field">
+          <label for="inputDescription">説明</label>
+          <textarea id="inputDescription" placeholder="例: 生徒数カウント・出席管理など"></textarea>
+        </div>
+        <div class="modal-field">
+          <label for="inputIcon">アイコン (絵文字)</label>
+          <input type="text" id="inputIcon" placeholder="例: 🔢" value="📁" />
+        </div>
+        <div class="modal-field">
+          <label for="inputImage">パネル画像パス</label>
+          <input type="text" id="inputImage" placeholder="例: images/counter.png" />
+        </div>
+        <div class="modal-field">
+          <label for="inputLink">リンク先</label>
+          <input type="text" id="inputLink" placeholder="例: category.html?cat=counter" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="btnCancel">キャンセル</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Context Menu -->
+  <div class="context-menu" id="contextMenu">
+    <div class="context-menu-item" id="ctxEdit">✏️ 編集</div>
+    <div class="context-menu-item danger" id="ctxDelete">🗑️ 削除</div>
+  </div>
+
+  <!-- Modal: Password -->
+  <div class="modal-backdrop" id="passwordModal">
+    <div class="modal-panel" style="max-width:360px;">
+      <h2 class="modal-title">🔐 パスワード入力</h2>
+      <form id="passwordForm">
+        <div class="modal-field">
+          <label for="inputPassword">パスワードを入力してください</label>
+          <input type="password" id="inputPassword" placeholder="パスワード" required autocomplete="off" />
+        </div>
+        <div id="pwError" style="color:#ef5350;font-size:0.85rem;margin-bottom:12px;display:none;">パスワードが正しくありません</div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="btnPwCancel">キャンセル</button>
+          <button type="submit" class="btn btn-primary">解除</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

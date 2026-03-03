@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="ECCベストワン Webアプリ カテゴリページ" />
+    <title>ECCベストワン Webアプリランチャー</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="category.css" />
+</head>
+
+<body>
+
+    <!-- Background -->
+    <div class="bg-container">
+        <img src="images/bg.png" alt="Background" />
+    </div>
+    <div class="bg-overlay"></div>
+
+    <!-- Floating Particles -->
+    <div class="particles-container" id="particles"></div>
+
+    <!-- Header -->
+    <header class="site-header cat-header">
+        <div class="cat-header-top">
+            <a href="index.html" class="back-link" id="backLink">← トップに戻る</a>
+            <button class="export-btn" id="exportBtn" style="display:none" title="デプロイ用にエクスポート">📤 エクスポート</button>
+        </div>
+        <h1 class="site-title" id="catTitle">
+            <span class="accent" id="catIcon">📁</span> <span id="catName">カテゴリ</span>
+        </h1>
+        <p class="site-subtitle" id="catDescription">── アプリ一覧 ──</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Search Bar -->
+        <div class="search-section" id="searchSection">
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="アプリ名・キャプション・タグで検索..." />
+                <button class="search-clear" id="searchClear" title="クリア">✕</button>
+            </div>
+            <div class="tag-filter-bar" id="tagFilterBar">
+                <!-- Tag buttons rendered by JS -->
+            </div>
+        </div>
+
+        <div class="app-grid" id="appGrid">
+            <!-- Rendered by JS -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        &copy; 2026 ECCベストワン藍住・北島中央
+    </footer>
+
+    <!-- Modal: Add/Edit App -->
+    <div class="modal-backdrop" id="appModal">
+        <div class="modal-panel">
+            <h2 class="modal-title" id="modalTitle">アプリ登録</h2>
+            <form id="appForm">
+                <div class="modal-field">
+                    <label for="inputAppName">アプリ名</label>
+                    <input type="text" id="inputAppName" placeholder="例: 出席カウンター" required />
+                </div>
+                <div class="modal-field">
+                    <label for="inputAppUrl">アプリURL</label>
+                    <input type="url" id="inputAppUrl" placeholder="例: https://example.com/app" />
+                </div>
+                <div class="modal-field">
+                    <label for="inputAppCaption">キャプション（任意）</label>
+                    <input type="text" id="inputAppCaption" placeholder="例: 日次出席管理用" />
+                </div>
+                <div class="modal-field">
+                    <label>タグ</label>
+                    <div class="tag-input-area">
+                        <div class="tag-list" id="tagList"></div>
+                        <div class="tag-input-row">
+                            <input type="text" id="inputTag" placeholder="タグを入力して Enter" />
+                            <button type="button" class="btn-tag-add" id="btnAddTag">追加</button>
+                        </div>
+                        <div class="tag-suggestions" id="tagSuggestions">
+                            <!-- Registered tag buttons rendered by JS -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-field">
+                    <label>スクリーンショット画像</label>
+                    <div class="image-upload-area" id="imageUploadArea">
+                        <div class="upload-placeholder" id="uploadPlaceholder">
+                            <span class="upload-icon">📷</span>
+                            <span>クリックまたはドラッグ&ドロップで画像を追加</span>
+                        </div>
+                        <img class="upload-preview" id="uploadPreview" alt="Preview" />
+                        <input type="file" id="inputAppImage" accept="image/*" hidden />
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="btnCancel">キャンセル</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-item" id="ctxEdit">✏️ 編集</div>
+        <div class="context-menu-item" id="ctxOpen">🚀 アプリを開く</div>
+        <div class="context-menu-item danger" id="ctxDelete">🗑️ 削除</div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="category.js"></script>
+</body>
+
+</html>
