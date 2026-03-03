@@ -124,10 +124,11 @@
   }
 
   // ---------- Render ----------
-  function renderGrid() {
+  async function renderGrid() {
     grid.innerHTML = '';
 
-    categories.forEach((cat, index) => {
+    for (let index = 0; index < categories.length; index++) {
+      const cat = categories[index];
       const card = document.createElement('a');
       card.className = 'category-card';
       if (isAuthenticated()) {
@@ -141,7 +142,7 @@
       card.style.opacity = '0';
 
       // Count apps in this category
-      const appCount = getAppCount(cat.id);
+      const appCount = await getAppCount(cat.id);
 
       card.innerHTML = `
         <div class="card-image">
@@ -178,7 +179,7 @@
       }
 
       grid.appendChild(card);
-    });
+    }
 
     // Add "+" card (local only)
     if (isLocal) {
@@ -191,11 +192,22 @@
     }
   }
 
-  function getAppCount(catId) {
+  async function getAppCount(catId) {
+    // Try localStorage first
     const key = `lp_cat_${catId}_apps`;
     const stored = localStorage.getItem(key);
     if (stored) {
       return JSON.parse(stored).length;
+    }
+    // Fallback: try static JSON (for Vercel)
+    if (!isLocal) {
+      try {
+        const res = await fetch(`data/${catId}.json`);
+        if (res.ok) {
+          const data = await res.json();
+          return data.length;
+        }
+      } catch { /* ignore */ }
     }
     return 0;
   }
@@ -419,9 +431,9 @@
   }
 
   // ---------- Init ----------
-  function init() {
+  async function init() {
     loadCategories();
-    renderGrid();
+    await renderGrid();
     createParticles();
     initEvents();
     updateLockUI();
