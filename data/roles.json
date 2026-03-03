@@ -11,7 +11,6 @@
       "label": "一般スタッフ",
       "password": "11223344",
       "categories": [
-        "counter",
         "learning",
         "mini",
         "database"
@@ -23,8 +22,8 @@
       "password": "55667788",
       "categories": [
         "learning",
-        "database",
-        "mini"
+        "mini",
+        "database"
       ]
     },
     {
@@ -32,7 +31,8 @@
       "label": "生徒",
       "password": "99887766",
       "categories": [
-        "learning"
+        "learning",
+        "mini"
       ]
     }
   ]
