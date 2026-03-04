@@ -61,6 +61,7 @@
   const toastContainer = document.getElementById('toastContainer');
   const lockBtn = document.getElementById('lockBtn');
   const settingsBtn = document.getElementById('settingsBtn');
+  const manualBtn = document.getElementById('manualBtn');
   const passwordModal = document.getElementById('passwordModal');
   const passwordForm = document.getElementById('passwordForm');
   const inputPassword = document.getElementById('inputPassword');
@@ -110,6 +111,10 @@
       settingsBtn.style.display = '';
     } else {
       settingsBtn.style.display = 'none';
+    }
+    // Show manual button for master (both local and online)
+    if (manualBtn) {
+      manualBtn.style.display = isMaster() ? '' : 'none';
     }
   }
 
@@ -563,6 +568,12 @@
 
     // Settings button
     settingsBtn.addEventListener('click', openSettingsModal);
+    // Manual button
+    if (manualBtn) {
+      manualBtn.addEventListener('click', () => {
+        window.open('maintenance-manual.html', '_blank');
+      });
+    }
     document.getElementById('btnSettingsClose').addEventListener('click', closeSettingsModal);
     document.getElementById('btnSettingsSave').addEventListener('click', () => {
       saveSettings();

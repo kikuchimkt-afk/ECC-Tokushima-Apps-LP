@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ECCベストワン Webアプリランチャー メンテナンスマニュアル</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg: #0f1117;
+            --bg-card: #1a1d27;
+            --bg-code: #12141c;
+            --text: #e4e6eb;
+            --text-muted: #9ca3af;
+            --accent: #60a5fa;
+            --accent2: #a78bfa;
+            --accent3: #34d399;
+            --border: #2a2d3a;
+            --warning: #fbbf24;
+            --danger: #f87171;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        /* ---- Hero ---- */
+        .hero {
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 50%, #0c4a6e 100%);
+            padding: 80px 40px 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 70%, rgba(96, 165, 250, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(167, 139, 250, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            position: relative;
+        }
+
+        .hero .version-badge {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 4px 16px;
+            border-radius: 20px;
+            background: rgba(96, 165, 250, 0.15);
+            color: var(--accent);
+            font-size: 0.85rem;
+            font-weight: 500;
+            position: relative;
+        }
+
+        /* ---- Layout ---- */
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ---- Sidebar TOC ---- */
+        .layout {
+            display: flex;
+            gap: 40px;
+            margin-top: -20px;
+            padding-bottom: 80px;
+        }
+
+        .sidebar {
+            width: 260px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .sidebar-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            padding-left: 16px;
+        }
+
+        .toc-link {
+            display: block;
+            padding: 6px 16px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-left: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .toc-link:hover,
+        .toc-link.active {
+            color: var(--accent);
+            border-left-color: var(--accent);
+            background: rgba(96, 165, 250, 0.05);
+        }
+
+        .toc-link.sub {
+            padding-left: 32px;
+            font-size: 0.82rem;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+            padding: 40px 0;
+        }
+
+        /* ---- Sections ---- */
+        .section {
+            margin-bottom: 56px;
+        }
+
+        .section h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h2 .icon {
+            font-size: 1.4rem;
+        }
+
+        .section h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin: 28px 0 12px;
+            color: var(--accent);
+        }
+
+        .section h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 20px 0 8px;
+            color: var(--accent2);
+        }
+
+        p {
+            margin-bottom: 12px;
+        }
+
+        /* ---- Screenshot ---- */
+        .screenshot {
+            margin: 20px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+        }
+
+        .screenshot img {
+            width: 100%;
+            display: block;
+        }
+
+        .screenshot-caption {
+            padding: 10px 16px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: center;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+        }
+
+        /* ---- Code Block ---- */
+        pre {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 20px;
+            overflow-x: auto;
+            margin: 12px 0 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(96, 165, 250, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.88em;
+            color: var(--accent);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--text);
+        }
+
+        /* ---- Table ---- */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-card);
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        tr:hover td {
+            background: rgba(96, 165, 250, 0.03);
+        }
+
+        /* ---- Alert ---- */
+        .alert {
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin: 16px 0;
+            font-size: 0.9rem;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .alert-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .alert-info {
+            background: rgba(96, 165, 250, 0.08);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+        }
+
+        .alert-warning {
+            background: rgba(251, 191, 36, 0.08);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+
+        .alert-danger {
+            background: rgba(248, 113, 113, 0.08);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        .alert-success {
+            background: rgba(52, 211, 153, 0.08);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+        }
+
+        /* ---- Steps ---- */
+        .steps {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+        }
+
+        .steps li {
+            counter-increment: step;
+            padding: 12px 0 12px 48px;
+            position: relative;
+            border-left: 2px solid var(--border);
+            margin-left: 16px;
+        }
+
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            left: -14px;
+            top: 12px;
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .steps li:last-child {
+            border-left-color: transparent;
+        }
+
+        /* ---- File tree ---- */
+        .file-tree {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 2;
+            margin: 16px 0;
+        }
+
+        .file-tree .dir {
+            color: var(--accent);
+        }
+
+        .file-tree .file {
+            color: var(--text-muted);
+        }
+
+        .file-tree .desc {
+            color: #555;
+            font-size: 0.78rem;
+        }
+
+        /* ---- Badge ---- */
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-blue {
+            background: rgba(96, 165, 250, 0.15);
+            color: var(--accent);
+        }
+
+        .badge-green {
+            background: rgba(52, 211, 153, 0.15);
+            color: var(--accent3);
+        }
+
+        .badge-yellow {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--warning);
+        }
+
+        .badge-red {
+            background: rgba(248, 113, 113, 0.15);
+            color: var(--danger);
+        }
+
+        /* ---- Key value ---- */
+        .kv-grid {
+            display: grid;
+            grid-template-columns: 160px 1fr;
+            gap: 8px 16px;
+            margin: 12px 0;
+            font-size: 0.9rem;
+        }
+
+        .kv-grid dt {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* ---- Footer ---- */
+        .manual-footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ---- Print ---- */
+        @media print {
+            .sidebar {
+                display: none;
+            }
+
+            .layout {
+                display: block;
+            }
+
+            .hero {
+                background: #1e1b4b;
+                -webkit-print-color-adjust: exact;
+            }
+
+            body {
+                background: #fff;
+                color: #1a1a1a;
+            }
+
+            .section h2 {
+                page-break-after: avoid;
+            }
+
+            .screenshot {
+                page-break-inside: avoid;
+            }
+        }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .layout {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ======== Hero ======== -->
+    <div class="hero">
+        <h1><span>ECCベストワン</span> Webアプリランチャー</h1>
+        <p>メンテナンスマニュアル</p>
+        <div class="version-badge">Version 2026.03 — 最終更新: 2026年3月4日</div>
+    </div>
+
+    <!-- ======== Layout ======== -->
+    <div class="container">
+        <div class="layout">
+
+            <!-- Sidebar TOC -->
+            <nav class="sidebar">
+                <div class="sidebar-title">目次</div>
+                <a class="toc-link" href="#overview">概要</a>
+                <a class="toc-link" href="#architecture">アーキテクチャ</a>
+                <a class="toc-link sub" href="#file-structure">ファイル構成</a>
+                <a class="toc-link sub" href="#data-storage">データ保存方式</a>
+                <a class="toc-link" href="#basic-ops">基本操作</a>
+                <a class="toc-link sub" href="#login">ログイン</a>
+                <a class="toc-link sub" href="#dashboard">ダッシュボード</a>
+                <a class="toc-link sub" href="#category-page">カテゴリページ</a>
+                <a class="toc-link sub" href="#app-register">アプリ登録</a>
+                <a class="toc-link" href="#admin">管理者操作</a>
+                <a class="toc-link sub" href="#role-settings">ロール設定</a>
+                <a class="toc-link sub" href="#category-manage">カテゴリ管理</a>
+                <a class="toc-link sub" href="#export">エクスポート</a>
+                <a class="toc-link" href="#local-server">ローカルサーバー起動</a>
+                <a class="toc-link" href="#deploy">デプロイ手順</a>
+                <a class="toc-link" href="#maintenance">メンテナンス</a>
+                <a class="toc-link sub" href="#data-backup">データバックアップ</a>
+                <a class="toc-link sub" href="#data-restore">データ復元</a>
+                <a class="toc-link sub" href="#folder-move">フォルダ移動</a>
+                <a class="toc-link" href="#troubleshooting">トラブルシューティング</a>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="main-content">
+
+                <!-- ===== 概要 ===== -->
+                <section class="section" id="overview">
+                    <h2><span class="icon">📖</span> 概要</h2>
+                    <p>ECCベストワン Webアプリランチャーは、学習塾で使用する各種Webアプリケーションを一元管理・起動するためのランディングページです。</p>
+
+                    <dl class="kv-grid">
+                        <dt>対象教室</dt>
+                        <dd>ECCベストワン藍住校・北島中央校</dd>
+                        <dt>動作環境</dt>
+                        <dd>Chrome / Safari / Edge（最新版）</dd>
+                        <dt>技術スタック</dt>
+                        <dd>HTML + CSS + Vanilla JS（フレームワーク不使用）</dd>
+                        <dt>デプロイ先</dt>
+                        <dd>Vercel（本番）/ localhost（ローカル開発）</dd>
+                        <dt>認証方式</dt>
+                        <dd>ロールベースパスワード認証（4ロール）</dd>
+                    </dl>
+                </section>
+
+                <!-- ===== アーキテクチャ ===== -->
+                <section class="section" id="architecture">
+                    <h2><span class="icon">🏗️</span> アーキテクチャ</h2>
+
+                    <h3 id="file-structure">ファイル構成</h3>
+                    <div class="file-tree">
+                        <span class="dir">ECC-Tokushima-Apps-LP/</span><br>
+                        ├── <span class="file">index.html</span> <span class="desc">…トップページ（カテゴリ一覧）</span><br>
+                        ├── <span class="file">category.html</span> <span class="desc">…カテゴリ詳細ページ（アプリ一覧）</span><br>
+                        ├── <span class="file">app.js</span> <span class="desc">…トップページのロジック（認証・カテゴリ管理）</span><br>
+                        ├── <span class="file">category.js</span> <span class="desc">…カテゴリページのロジック（アプリCRUD）</span><br>
+                        ├── <span class="file">style.css</span> <span class="desc">…共通スタイル</span><br>
+                        ├── <span class="file">category.css</span> <span class="desc">…カテゴリページ専用スタイル</span><br>
+                        ├── <span class="file">manifest.json</span> <span class="desc">…PWAマニフェスト（ホーム画面アイコン）</span><br>
+                        ├── <span class="file">start.bat</span> <span class="desc">…ローカルサーバー起動スクリプト</span><br>
+                        ├── <span class="dir">data/</span> <span class="desc">…デプロイ用JSONデータ</span><br>
+                        │ ├── <span class="file">counter.json</span><br>
+                        │ ├── <span class="file">learning.json</span><br>
+                        │ ├── <span class="file">accounting.json</span><br>
+                        │ ├── <span class="file">mini.json</span><br>
+                        │ ├── <span class="file">database.json</span><br>
+                        │ └── <span class="file">roles.json</span> <span class="desc">…ロール設定</span><br>
+                        └── <span class="dir">images/</span> <span class="desc">…画像ファイル</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">bg.png</span> <span class="desc">…背景画像</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">icon-512.png</span> <span
+                            class="desc">…ファビコン（512px）</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">apple-touch-icon.png</span> <span
+                            class="desc">…iPhone用（180px）</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;└── <span class="file">*.png</span> <span class="desc">…カテゴリカード画像</span>
+                    </div>
+
+                    <h3 id="data-storage">データ保存方式</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>データ種別</th>
+                                    <th>ローカル環境</th>
+                                    <th>Vercel（本番）</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>カテゴリ情報</td>
+                                    <td><code>localStorage</code>（キー: <code>lp_categories</code>）</td>
+                                    <td><code>localStorage</code>（デフォルト値をJS内に保持）</td>
+                                </tr>
+                                <tr>
+                                    <td>アプリ一覧</td>
+                                    <td><code>localStorage</code>（キー: <code>lp_cat_{catId}_apps</code>）</td>
+                                    <td><code>data/{catId}.json</code> から読込</td>
+                                </tr>
+                                <tr>
+                                    <td>アプリ画像</td>
+                                    <td><code>IndexedDB</code>（DB: <code>lp_images_db</code>）</td>
+                                    <td><code>data/{catId}.json</code> 内に base64 埋め込み</td>
+                                </tr>
+                                <tr>
+                                    <td>認証状態</td>
+                                    <td><code>localStorage</code>（<code>lp_authenticated</code> 等）</td>
+                                    <td>同左</td>
+                                </tr>
+                                <tr>
+                                    <td>ロール設定</td>
+                                    <td><code>localStorage</code>（<code>lp_roles_config</code>）</td>
+                                    <td><code>data/roles.json</code> から読込</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <span class="alert-icon">💡</span>
+                        <div>ローカル環境で<code>localStorage</code>が空の場合、<code>data/</code>フォルダのJSONファイルから自動復元する機能が実装されています。
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== 基本操作 ===== -->
+                <section class="section" id="basic-ops">
+                    <h2><span class="icon">🖥️</span> 基本操作</h2>
+
+                    <h3 id="login">ログイン</h3>
+                    <p>アプリにアクセスすると、ログインモーダルが自動表示されます。ロールに応じたパスワードを入力してログインします。</p>
+
+                    <div class="screenshot">
+                        <img src="images/manual/login_screen.png" alt="ログイン画面" />
+                        <div class="screenshot-caption">図1: ログイン画面 — パスワード入力でロール認証を行う</div>
+                    </div>
+
+                    <h4>デフォルトロール一覧</h4>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ロール</th>
+                                    <th>権限</th>
+                                    <th>初期パスワード</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge badge-red">マスター</span></td>
+                                    <td>全カテゴリ＋設定変更＋カテゴリ追加/削除</td>
+                                    <td><code>54834646</code></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-blue">一般スタッフ</span></td>
+                                    <td>カウンター/学習/ミニ/データベース</td>
+                                    <td><code>11223344</code></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-green">外部</span></td>
+                                    <td>学習/データベース/ミニ</td>
+                                    <td><code>55667788</code></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-yellow">生徒</span></td>
+                                    <td>学習のみ</td>
+                                    <td><code>99887766</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <span class="alert-icon">⚠️</span>
+                        <div>パスワードはローカル環境の設定画面から変更できます。変更後は<strong>エクスポート</strong>して <code>data/roles.json</code>
+                            に反映する必要があります。</div>
+                    </div>
+
+                    <h3 id="dashboard">ダッシュボード（トップページ）</h3>
+                    <p>ログイン後、アクセス可能なカテゴリがカード形式で表示されます。各カードには登録済みアプリ数が表示されます。</p>
+
+                    <div class="screenshot">
+                        <img src="images/manual/main_dashboard.png" alt="メインダッシュボード" />
+                        <div class="screenshot-caption">図2: メインダッシュボード — カテゴリカードをクリックしてアプリ一覧へ</div>
+                    </div>
+
+                    <h4>ヘッダーアイコン</h4>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>アイコン</th>
+                                    <th>機能</th>
+                                    <th>表示条件</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>⚙️</td>
+                                    <td>設定モーダルを開く</td>
+                                    <td>マスターログイン中 ＋ ローカル環境</td>
+                                </tr>
+                                <tr>
+                                    <td>🔓 / 🔒</td>
+                                    <td>ログアウト / ログイン</td>
+                                    <td>常時表示</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 id="category-page">カテゴリページ</h3>
+                    <p>カテゴリをクリックすると、そのカテゴリに登録されたアプリの一覧が表示されます。検索バーやタグフィルターでアプリを絞り込むことができます。</p>
+
+                    <div class="screenshot">
+                        <img src="images/manual/category_page.png" alt="カテゴリページ" />
+                        <div class="screenshot-caption">図3: カテゴリページ（カウンターツール） — 登録済みアプリがカードで一覧表示</div>
+                    </div>
+
+                    <h4>カテゴリページの操作</h4>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>操作</th>
+                                    <th>説明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>🔍 検索バー</td>
+                                    <td>アプリ名・キャプション・タグでフィルタリング</td>
+                                </tr>
+                                <tr>
+                                    <td>タグボタン</td>
+                                    <td>タグをクリックしてフィルタリング（複数選択可）</td>
+                                </tr>
+                                <tr>
+                                    <td>カードクリック</td>
+                                    <td>アプリのURLを新しいタブで開く</td>
+                                </tr>
+                                <tr>
+                                    <td>✏️ / 🗑️ ボタン</td>
+                                    <td>アプリの編集 / 削除（ローカル環境のみ）</td>
+                                </tr>
+                                <tr>
+                                    <td>ドラッグ&ドロップ</td>
+                                    <td>カードを並べ替え（ローカル環境のみ）</td>
+                                </tr>
+                                <tr>
+                                    <td>📤 エクスポート</td>
+                                    <td>カテゴリのデータをJSON形式でダウンロード</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 id="app-register">アプリ登録</h3>
+                    <p>カテゴリページ内の「+ アプリ追加」カードをクリックすると、アプリ登録モーダルが表示されます。</p>
+
+                    <div class="screenshot">
+                        <img src="images/manual/app_registration_modal.png" alt="アプリ登録モーダル" />
+                        <div class="screenshot-caption">図4: アプリ登録モーダル — アプリ名・URL・キャプション・タグ・画像を設定</div>
+                    </div>
+
+                    <h4>入力項目</h4>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>項目</th>
+                                    <th>必須</th>
+                                    <th>説明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>アプリ名</td>
+                                    <td><span class="badge badge-red">必須</span></td>
+                                    <td>カードに表示されるアプリの名前</td>
+                                </tr>
+                                <tr>
+                                    <td>アプリURL</td>
+                                    <td>任意</td>
+                                    <td>クリック時に開くURL</td>
+                                </tr>
+                                <tr>
+                                    <td>キャプション</td>
+                                    <td>任意</td>
+                                    <td>アプリの説明文（カード下部に表示）</td>
+                                </tr>
+                                <tr>
+                                    <td>タグ</td>
+                                    <td>任意</td>
+                                    <td>検索・フィルタリング用のタグ（複数設定可能）</td>
+                                </tr>
+                                <tr>
+                                    <td>スクリーンショット画像</td>
+                                    <td>任意</td>
+                                    <td>クリック / ドラッグ&ドロップ / ペーストで画像を追加</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- ===== 管理者操作 ===== -->
+                <section class="section" id="admin">
+                    <h2><span class="icon">🔧</span> 管理者操作</h2>
+
+                    <div class="alert alert-info">
+                        <span class="alert-icon">ℹ️</span>
+                        <div>以下の操作は<strong>マスターロール</strong>かつ<strong>ローカル環境</strong>でのみ実行可能です。</div>
+                    </div>
+
+                    <h3 id="role-settings">ロール設定</h3>
+                    <p>ヘッダーの ⚙️ ボタンから設定モーダルを開き、各ロールのパスワードとアクセス可能カテゴリを変更できます。</p>
+
+                    <div class="screenshot">
+                        <img src="images/manual/settings_modal.png" alt="設定モーダル" />
+                        <div class="screenshot-caption">図5: 設定モーダル — ロールごとのパスワード・カテゴリアクセス権限を管理</div>
+                    </div>
+
+                    <ol class="steps">
+                        <li>マスターとしてログイン（ヘッダーに ⚙️ が表示される）</li>
+                        <li>⚙️ ボタンをクリック → 設定モーダルが開く</li>
+                        <li>各ロールのパスワード欄を編集</li>
+                        <li>非マスターロールのアクセス可能カテゴリをチェックボックスで設定</li>
+                        <li>「保存」をクリックして設定を反映</li>
+                        <li>「📤 エクスポート」で <code>roles.json</code> をダウンロード → <code>data/</code> フォルダに保存</li>
+                    </ol>
+
+                    <h3 id="category-manage">カテゴリ管理</h3>
+                    <p>トップページの「+ カテゴリ追加」カードから新規カテゴリを追加できます。既存カテゴリは右クリックで編集・削除が可能です。</p>
+
+                    <div class="screenshot">
+                        <img src="images/manual/add_category_modal.png" alt="カテゴリ追加モーダル" />
+                        <div class="screenshot-caption">図6: カテゴリ追加モーダル — カテゴリ名・アイコン・説明・画像パスを設定</div>
+                    </div>
+
+                    <div class="screenshot">
+                        <img src="images/manual/context_menu.png" alt="コンテキストメニュー" />
+                        <div class="screenshot-caption">図7: コンテキストメニュー — カテゴリカードを右クリックして編集/削除</div>
+                    </div>
+
+                    <h3 id="export">エクスポート（Vercel同期）</h3>
+                    <p>ローカルでの変更をVercelに反映するには、データをJSONエクスポートして <code>data/</code> フォルダに保存する必要があります。</p>
+
+                    <ol class="steps">
+                        <li>対象カテゴリページを開く</li>
+                        <li>右上の「📤 エクスポート」ボタンをクリック</li>
+                        <li><code>{catId}.json</code> がダウンロードされる</li>
+                        <li>ダウンロードしたファイルを <code>data/</code> フォルダに上書き保存</li>
+                        <li>Git commit → push して Vercel にデプロイ</li>
+                    </ol>
+
+                    <div class="alert alert-warning">
+                        <span class="alert-icon">⚠️</span>
+                        <div>全カテゴリを本番反映するには、各カテゴリページごとにエクスポートが必要です。また、設定画面の「📤 エクスポート」で <code>roles.json</code>
+                            も忘れずにエクスポートしてください。</div>
+                    </div>
+                </section>
+
+                <!-- ===== ローカルサーバー起動 ===== -->
+                <section class="section" id="local-server">
+                    <h2><span class="icon">🚀</span> ローカルサーバー起動</h2>
+
+                    <h4>方法1: start.bat を使う</h4>
+                    <p>プロジェクトフォルダ内の <code>start.bat</code> をダブルクリックすると、自動でHTTPサーバーが起動しブラウザが開きます。</p>
+
+                    <h4>方法2: コマンドラインから起動</h4>
+                    <pre><code># PowerShell / コマンドプロンプト
+cd "C:\Users\makoto\Documents\アプリ開発\ECC-Tokushima-Apps-LP"
+python -m http.server 8000</code></pre>
+                    <p>起動後、ブラウザで <code>http://localhost:8000</code> にアクセスします。</p>
+
+                    <div class="alert alert-info">
+                        <span class="alert-icon">💡</span>
+                        <div>ローカルサーバーが必要な理由: <code>file://</code> プロトコルでは <code>fetch()</code> が動作せず、<code>data/</code>
+                            フォルダからのデータ読み込みに失敗します。</div>
+                    </div>
+                </section>
+
+                <!-- ===== デプロイ手順 ===== -->
+                <section class="section" id="deploy">
+                    <h2><span class="icon">🌐</span> Vercelデプロイ手順</h2>
+
+                    <ol class="steps">
+                        <li>全カテゴリのデータを「📤 エクスポート」でダウンロードし、<code>data/</code> フォルダに保存</li>
+                        <li>設定モーダルから <code>roles.json</code> もエクスポートし、<code>data/</code> フォルダに保存</li>
+                        <li>
+                            Git でコミット・プッシュ:
+                            <pre><code>git add .
+git commit -m "データ更新"
+git push</code></pre>
+                        </li>
+                        <li>Vercelが自動デプロイを実行（通常1〜2分で完了）</li>
+                        <li>本番URLでアプリの動作を確認</li>
+                    </ol>
+
+                    <div class="alert alert-danger">
+                        <span class="alert-icon">🚨</span>
+                        <div><strong>ファイル名の注意:</strong> Vercelにデプロイするファイル名にはスペースや日本語を使わないでください。リンク切れの原因になります。</div>
+                    </div>
+                </section>
+
+                <!-- ===== メンテナンス ===== -->
+                <section class="section" id="maintenance">
+                    <h2><span class="icon">🛠️</span> メンテナンス</h2>
+
+                    <h3 id="data-backup">データバックアップ</h3>
+                    <p>定期的にデータをバックアップしておくことを推奨します。</p>
+
+                    <ol class="steps">
+                        <li>各カテゴリページ → 「📤 エクスポート」でJSONをダウンロード</li>
+                        <li>設定画面 → 「📤 エクスポート」で <code>roles.json</code> をダウンロード</li>
+                        <li>ダウンロードしたJSONファイルをバックアップフォルダに保存</li>
+                    </ol>
+
+                    <h3 id="data-restore">データ復元</h3>
+                    <p>バックアップからデータを復元するには:</p>
+
+                    <ol class="steps">
+                        <li>バックアップの <code>*.json</code> ファイルを <code>data/</code> フォルダにコピー</li>
+                        <li>ブラウザの localStorage をクリア（DevTools → Application → Clear storage）</li>
+                        <li>ページをリロード → <code>data/</code> フォルダから自動復元される</li>
+                    </ol>
+
+                    <h3 id="folder-move">フォルダ移動時の対応</h3>
+                    <p>プロジェクトフォルダを別の場所に移動した場合、ブラウザの <code>localStorage</code>
+                        はオリジン（<code>localhost:8000</code>）に紐づいているため、通常はデータが引き継がれます。</p>
+                    <p>ただし、以前のデータが表示されない場合は以下を確認してください:</p>
+
+                    <ol class="steps">
+                        <li><code>data/</code> フォルダにJSONファイルが存在するか確認</li>
+                        <li>ブラウザでスーパーリロード（<code>Ctrl+Shift+R</code>）</li>
+                        <li>カテゴリを開くと、<code>data/</code> から自動で復元される</li>
+                    </ol>
+                </section>
+
+                <!-- ===== トラブルシューティング ===== -->
+                <section class="section" id="troubleshooting">
+                    <h2><span class="icon">🔍</span> トラブルシューティング</h2>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:35%">症状</th>
+                                    <th>原因と対処</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>「0 アプリ登録済」と表示される</td>
+                                    <td>
+                                        <code>localStorage</code> にデータがない状態。<code>data/</code>
+                                        フォルダにJSONがあれば、カテゴリページを開くと自動復元されます。JSONもない場合はバックアップから復元してください。
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>ログインモーダルが表示されない</td>
+                                    <td>すでにログイン済みの状態です。🔓 ボタンをクリックしてログアウトしてからやり直してください。</td>
+                                </tr>
+                                <tr>
+                                    <td>⚙️ 設定ボタンが表示されない</td>
+                                    <td>マスターロールでログイン中かつローカル環境（<code>localhost</code>）でのみ表示されます。Vercel上では非表示です。</td>
+                                </tr>
+                                <tr>
+                                    <td>アプリの画像が表示されない</td>
+                                    <td>
+                                        画像は <code>IndexedDB</code>
+                                        に保存されます。ブラウザのストレージがクリアされた場合は画像が失われます。再度エクスポート→インポートするか、アプリを編集して画像を再登録してください。
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Vercel上でリンクが壊れる</td>
+                                    <td>ファイル名にスペース・日本語・括弧が含まれていないか確認してください。ASCII文字のみのファイル名に変更してください。</td>
+                                </tr>
+                                <tr>
+                                    <td>ファビコンが表示されない</td>
+                                    <td><code>Ctrl+Shift+R</code> でスーパーリロードしてください。キャッシュが原因の場合はこれで解消します。</td>
+                                </tr>
+                                <tr>
+                                    <td>ローカルサーバーが起動しない</td>
+                                    <td>
+                                        Python がインストールされているか確認: <code>python --version</code>。未インストールの場合は <a
+                                            href="https://www.python.org/downloads/"
+                                            style="color:var(--accent);">python.org</a> から 3.13.x をインストールし、「Add to
+                                        PATH」にチェックを入れてください。
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>ホーム画面のアイコンが正しくない</td>
+                                    <td>
+                                        <code>manifest.json</code> と <code>&lt;link rel="apple-touch-icon"&gt;</code>
+                                        が正しく設定されているか確認。ホーム画面から一度削除して再追加してください。
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h4>ブラウザの開発者ツールで確認</h4>
+                    <p>問題発生時は、ブラウザの開発者ツール（<code>F12</code>）を使って以下を確認してください:</p>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>タブ</th>
+                                    <th>確認内容</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Console</td>
+                                    <td>JavaScriptエラーの有無</td>
+                                </tr>
+                                <tr>
+                                    <td>Application → Local Storage</td>
+                                    <td>保存されているデータの確認・手動編集</td>
+                                </tr>
+                                <tr>
+                                    <td>Application → IndexedDB</td>
+                                    <td>アプリ画像データの確認</td>
+                                </tr>
+                                <tr>
+                                    <td>Network</td>
+                                    <td><code>data/*.json</code> の読み込み状況（404エラー等）</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="manual-footer">
+        &copy; 2026 ECCベストワン藍住・北島中央 — Maintenance Manual v2026.03
+    </footer>
+
+    <!-- TOC active highlight -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const links = document.querySelectorAll('.toc-link');
+            const sections = [];
+            links.forEach(l => {
+                const id = l.getAttribute('href')?.replace('#', '');
+                if (id) {
+                    const el = document.getElementById(id);
+                    if (el) sections.push({ el, link: l });
+                }
+            });
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(e => {
+                    const item = sections.find(s => s.el === e.target);
+                    if (item) item.link.classList.toggle('active', e.isIntersecting);
+                });
+            }, { rootMargin: '-20% 0px -70% 0px' });
+            sections.forEach(s => observer.observe(s.el));
+        });
+    </script>
+
+</body>
+
+</html>
