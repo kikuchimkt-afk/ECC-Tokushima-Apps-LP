@@ -641,6 +641,14 @@
             // Local: load from localStorage + IndexedDB
             loadApps();
             await migrateToIDB();
+            // If localStorage is empty, try loading from data/*.json as fallback
+            if (apps.length === 0) {
+                const loaded = await loadFromStaticJSON();
+                if (loaded) {
+                    saveApps(); // persist to localStorage for next time
+                    showToast('📂 data/ フォルダからアプリデータを復元しました');
+                }
+            }
         }
 
         renderTagFilterBar();

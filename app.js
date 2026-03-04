@@ -225,12 +225,11 @@
     const key = `lp_cat_${catId}_apps`;
     const stored = localStorage.getItem(key);
     if (stored) return JSON.parse(stored).length;
-    if (!isLocal) {
-      try {
-        const res = await fetch(`data/${catId}.json`);
-        if (res.ok) return (await res.json()).length;
-      } catch { /* ignore */ }
-    }
+    // Fallback: try loading from data/*.json (both local and remote)
+    try {
+      const res = await fetch(`data/${catId}.json`);
+      if (res.ok) return (await res.json()).length;
+    } catch { /* ignore */ }
     return 0;
   }
 
