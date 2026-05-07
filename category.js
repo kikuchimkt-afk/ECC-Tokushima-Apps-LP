@@ -468,7 +468,7 @@
     // ---------- CRUD ----------
     async function addApp(data) {
         const id = 'app_' + Date.now();
-        apps.push({ id, name: data.name, url: data.url, caption: data.caption, tags: data.tags || [], _hasImage: !!data.image });
+        apps.unshift({ id, name: data.name, url: data.url, caption: data.caption, tags: data.tags || [], _hasImage: !!data.image });
         saveApps();
         if (data.image) await idbSave(id, data.image);
         await renderGrid();

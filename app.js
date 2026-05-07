@@ -272,7 +272,7 @@
   // ---------- CRUD ----------
   function addCategory(data) {
     const id = 'cat_' + Date.now();
-    categories.push({
+    categories.unshift({
       id,
       title: data.title,
       description: data.description || '',
