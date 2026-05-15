@@ -651,6 +651,14 @@
             }
         }
 
+        // 新しいものを上に配置する (idのタイムスタンプで降順ソート)
+        apps.sort((a, b) => {
+            const timeA = parseInt((a.id || '').replace('app_', ''), 10) || 0;
+            const timeB = parseInt((b.id || '').replace('app_', ''), 10) || 0;
+            return timeB - timeA;
+        });
+        if (isLocal) saveApps();
+
         renderTagFilterBar();
         await renderGrid();
         createParticles();
