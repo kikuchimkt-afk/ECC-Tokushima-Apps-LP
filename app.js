@@ -230,11 +230,11 @@
   async function getAppCount(catId) {
     const key = `lp_cat_${catId}_apps`;
     const stored = localStorage.getItem(key);
-    if (stored) return JSON.parse(stored).length;
+    if (stored) return JSON.parse(stored).filter(item => item.type !== 'spacer').length;
     // Fallback: try loading from data/*.json (both local and remote)
     try {
       const res = await fetch(`data/${catId}.json`);
-      if (res.ok) return (await res.json()).length;
+      if (res.ok) return (await res.json()).filter(item => item.type !== 'spacer').length;
     } catch { /* ignore */ }
     return 0;
   }

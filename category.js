@@ -219,6 +219,9 @@
     function getFilteredApps() {
         let list = apps;
         const q = searchQuery.toLowerCase().trim();
+        if (q || activeFilterTags.length > 0) {
+            list = list.filter(a => a.type !== 'spacer');
+        }
         if (q) {
             list = list.filter(a => {
                 const n = (a.name || '').toLowerCase();
@@ -250,6 +253,36 @@
     }
 
     // ---------- Render ----------
+    function enableDrag(element, itemId) {
+        element.draggable = true;
+        element.classList.add('sortable');
+        element.title = 'ドラッグして並べ替え';
+
+        element.addEventListener('dragstart', (e) => {
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', itemId);
+            element.classList.add('dragging');
+            setTimeout(() => element.style.opacity = '0.4', 0);
+        });
+        element.addEventListener('dragend', () => {
+            element.classList.remove('dragging');
+            element.style.opacity = '1';
+            document.querySelectorAll('.sortable.drag-over').forEach(el => el.classList.remove('drag-over'));
+        });
+        element.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            if (grid.querySelector('.dragging') !== element) element.classList.add('drag-over');
+        });
+        element.addEventListener('dragleave', () => element.classList.remove('drag-over'));
+        element.addEventListener('drop', (e) => {
+            e.preventDefault();
+            element.classList.remove('drag-over');
+            const draggedId = e.dataTransfer.getData('text/plain');
+            if (draggedId && draggedId !== itemId) reorderApps(draggedId, itemId);
+        });
+    }
+
     async function renderGrid() {
         grid.innerHTML = '';
         const filtered = getFilteredApps();
@@ -263,6 +296,26 @@
 
         for (let i = 0; i < filtered.length; i++) {
             const app = filtered[i];
+
+            if (app.type === 'spacer') {
+                const spacer = document.createElement('div');
+                spacer.className = 'app-grid-spacer';
+                spacer.dataset.id = app.id;
+                if (isLocal) {
+                    spacer.classList.add('editable');
+                    spacer.innerHTML = `
+                      <span class="spacer-label">空白グリッド<br><small>PC表示用</small></span>
+                      <button class="spacer-delete-btn" type="button" title="空白グリッドを削除">🗑️</button>`;
+                    enableDrag(spacer, app.id);
+                    spacer.querySelector('.spacer-delete-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deleteApp(app.id);
+                    });
+                }
+                grid.appendChild(spacer);
+                continue;
+            }
+
             const card = document.createElement('div');
             card.className = 'app-card';
             card.dataset.id = app.id;
@@ -270,9 +323,7 @@
             card.style.animation = 'card-fade-in 0.5s ease-out forwards';
             card.style.opacity = '0';
             if (isLocal) {
-                card.draggable = true;
-                card.classList.add('sortable');
-                card.title = 'ドラッグして並べ替え';
+                enableDrag(card, app.id);
             }
 
             // Load image from IndexedDB
@@ -311,26 +362,6 @@
                 if (db2) db2.addEventListener('click', (e) => { e.stopPropagation(); deleteApp(app.id); });
                 card.addEventListener('contextmenu', (e) => { e.preventDefault(); showContextMenu(e.clientX, e.clientY, app.id); });
 
-                card.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.effectAllowed = 'move';
-                    e.dataTransfer.setData('text/plain', app.id);
-                    card.classList.add('dragging');
-                    setTimeout(() => card.style.opacity = '0.4', 0);
-                });
-                card.addEventListener('dragend', () => {
-                    card.classList.remove('dragging'); card.style.opacity = '1';
-                    document.querySelectorAll('.app-card.drag-over').forEach(el => el.classList.remove('drag-over'));
-                });
-                card.addEventListener('dragover', (e) => {
-                    e.preventDefault(); e.dataTransfer.dropEffect = 'move';
-                    if (grid.querySelector('.dragging') !== card) card.classList.add('drag-over');
-                });
-                card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
-                card.addEventListener('drop', (e) => {
-                    e.preventDefault(); card.classList.remove('drag-over');
-                    const did = e.dataTransfer.getData('text/plain');
-                    if (did && did !== app.id) reorderApps(did, app.id);
-                });
             }
             grid.appendChild(card);
         }
@@ -341,6 +372,12 @@
             ac.innerHTML = `<span class="plus-icon">+</span> アプリ追加`;
             ac.addEventListener('click', () => openModal());
             grid.appendChild(ac);
+
+            const spacerCard = document.createElement('div');
+            spacerCard.className = 'add-app-card add-spacer-card';
+            spacerCard.innerHTML = `<span class="plus-icon">□</span> 空白グリッド追加 <small>PC表示用</small>`;
+            spacerCard.addEventListener('click', addSpacer);
+            grid.appendChild(spacerCard);
         }
     }
 
@@ -480,6 +517,13 @@
         showToast(`「${data.name}」を登録しました`);
     }
 
+    async function addSpacer() {
+        apps.push({ id: 'spacer_' + Date.now(), type: 'spacer' });
+        saveApps();
+        await renderGrid();
+        showToast('空白グリッドを追加しました');
+    }
+
     async function updateApp(appId, data) {
         const idx = apps.findIndex(a => a.id === appId);
         if (idx === -1) return;
@@ -493,12 +537,13 @@
     async function deleteApp(appId) {
         const app = apps.find(a => a.id === appId);
         if (!app) return;
-        if (!confirm(`「${app.name}」を削除しますか？`)) return;
+        const label = app.type === 'spacer' ? '空白グリッド' : `「${app.name}」`;
+        if (!confirm(`${label}を削除しますか？`)) return;
         apps = apps.filter(a => a.id !== appId);
         saveApps();
         await idbDelete(appId);
         await renderGrid();
-        showToast(`「${app.name}」を削除しました`);
+        showToast(`${label}を削除しました`);
     }
 
     // ---------- Particles ----------
@@ -582,6 +627,10 @@
         showToast('エクスポート準備中...');
         const exportData = [];
         for (const app of apps) {
+            if (app.type === 'spacer') {
+                exportData.push({ id: app.id, type: 'spacer' });
+                continue;
+            }
             const entry = {
                 id: app.id,
                 name: app.name,

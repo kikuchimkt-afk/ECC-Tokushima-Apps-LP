@@ -323,16 +323,69 @@
     cursor: grabbing;
 }
 
-.app-card.dragging {
+.app-card.dragging,
+.app-grid-spacer.editable.dragging {
     opacity: 0.4;
     transform: scale(0.95);
     box-shadow: none;
 }
 
-.app-card.drag-over {
+.app-card.drag-over,
+.app-grid-spacer.editable.drag-over {
     border-color: var(--color-accent);
     box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.3);
     transform: scale(1.03);
+}
+
+/* Empty desktop grid cell used to separate groups */
+.app-grid-spacer {
+    min-height: 300px;
+    visibility: hidden;
+}
+
+.app-grid-spacer.editable {
+    visibility: visible;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed rgba(255, 255, 255, 0.28);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    background: rgba(255, 255, 255, 0.035);
+    cursor: grab;
+    transition: all var(--transition-smooth);
+}
+
+.app-grid-spacer.editable:active {
+    cursor: grabbing;
+}
+
+.spacer-label {
+    text-align: center;
+    line-height: 1.6;
+}
+
+.spacer-label small {
+    opacity: 0.72;
+}
+
+.spacer-delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--color-glass-border);
+    background: rgba(20, 30, 48, 0.85);
+    color: inherit;
+    cursor: pointer;
+}
+
+.add-spacer-card small {
+    font-size: 0.72rem;
+    opacity: 0.72;
 }
 
 /* Card Screenshot Area */
@@ -541,6 +594,11 @@
 
 /* ---------- Responsive ---------- */
 @media (max-width: 768px) {
+    .app-grid-spacer,
+    .add-spacer-card {
+        display: none;
+    }
+
     .app-grid {
         grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 16px;
