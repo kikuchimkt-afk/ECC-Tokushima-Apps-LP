@@ -269,7 +269,11 @@
             card.style.animationDelay = `${i * 0.08}s`;
             card.style.animation = 'card-fade-in 0.5s ease-out forwards';
             card.style.opacity = '0';
-            if (isLocal) card.draggable = true;
+            if (isLocal) {
+                card.draggable = true;
+                card.classList.add('sortable');
+                card.title = 'ドラッグして並べ替え';
+            }
 
             // Load image from IndexedDB
             let imgSrc = app._hasImage ? await idbLoad(app.id) : null;
@@ -651,14 +655,6 @@
                 }
             }
         }
-
-        // 新しいものを上に配置する (idのタイムスタンプで降順ソート)
-        apps.sort((a, b) => {
-            const timeA = parseInt((a.id || '').replace('app_', ''), 10) || 0;
-            const timeB = parseInt((b.id || '').replace('app_', ''), 10) || 0;
-            return timeB - timeA;
-        });
-        if (isLocal) saveApps();
 
         renderTagFilterBar();
         await renderGrid();

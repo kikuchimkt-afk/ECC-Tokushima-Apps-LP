@@ -315,6 +315,14 @@
     transform: translateY(-2px) scale(0.99);
 }
 
+.app-card.sortable {
+    cursor: grab;
+}
+
+.app-card.sortable:active {
+    cursor: grabbing;
+}
+
 .app-card.dragging {
     opacity: 0.4;
     transform: scale(0.95);
