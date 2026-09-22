@@ -8,7 +8,7 @@
   // ---------- Default Roles ----------
   const DEFAULT_ROLES = [
     { name: 'master', label: 'マスター', password: '54834646', categories: '*' },
-    { name: 'staff', label: '一般スタッフ', password: '11223344', categories: ['counter', 'learning', 'mini', 'database'] },
+    { name: 'staff', label: '一般スタッフ', password: '11223344', categories: ['counter', 'learning', 'mini', 'database', 'event'] },
     { name: 'external', label: '外部', password: '55667788', categories: ['learning', 'database', 'mini'] },
     { name: 'student', label: '生徒', password: '99887766', categories: ['learning'] }
   ];
@@ -36,7 +36,8 @@
     { id: 'learning', title: '学習アプリ', description: '教科学習・テスト対策アプリ', icon: '📚', image: 'images/learning.png', link: 'category.html?cat=learning' },
     { id: 'accounting', title: '経理ツール', description: '月謝管理・会計処理ツール', icon: '💼', image: 'images/accounting.png', link: 'category.html?cat=accounting' },
     { id: 'mini', title: 'ミニアプリ', description: '便利な小型ユーティリティ', icon: '⚡', image: 'images/mini.png', link: 'category.html?cat=mini' },
-    { id: 'database', title: 'データベース', description: 'データ管理・検索・分析ツール', icon: '🗄️', image: 'images/database.png', link: 'category.html?cat=database' }
+    { id: 'database', title: 'データベース', description: 'データ管理・検索・分析ツール', icon: '🗄️', image: 'images/database.png', link: 'category.html?cat=database' },
+    { id: 'event', title: 'イベント管理', description: '行事・説明会・参加者管理ツール', icon: '📅', image: 'images/event.png', link: 'category.html?cat=event' }
   ];
   const STORAGE_KEY = 'lp_categories';
 

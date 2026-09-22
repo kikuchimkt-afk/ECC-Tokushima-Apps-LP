@@ -14,7 +14,8 @@
         "counter",
         "learning",
         "mini",
-        "database"
+        "database",
+        "event"
       ]
     },
     {

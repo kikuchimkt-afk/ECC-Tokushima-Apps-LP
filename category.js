@@ -33,7 +33,8 @@
         learning: { title: '学習アプリ', icon: '📚', description: '教科学習・テスト対策アプリ' },
         accounting: { title: '経理ツール', icon: '💼', description: '月謝管理・会計処理ツール' },
         mini: { title: 'ミニアプリ', icon: '⚡', description: '便利な小型ユーティリティ' },
-        database: { title: 'データベース', icon: '🗄️', description: 'データ管理・検索・分析ツール' }
+        database: { title: 'データベース', icon: '🗄️', description: 'データ管理・検索・分析ツール' },
+        event: { title: 'イベント管理', icon: '📅', description: '行事・説明会・参加者管理ツール' }
     };
 
     // ---------- Get Category from URL ----------
