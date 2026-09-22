@@ -662,7 +662,7 @@
     // ---------- Load from static JSON (Vercel) ----------
     async function loadFromStaticJSON() {
         try {
-            const res = await fetch(`data/${catId}.json`);
+            const res = await fetch(`data/${catId}.json`, { cache: isLocal ? 'no-store' : 'default' });
             if (!res.ok) return false;
             const data = await res.json();
             apps = data.map(a => ({

@@ -233,7 +233,7 @@
     if (stored) return JSON.parse(stored).filter(item => item.type !== 'spacer').length;
     // Fallback: try loading from data/*.json (both local and remote)
     try {
-      const res = await fetch(`data/${catId}.json`);
+      const res = await fetch(`data/${catId}.json`, { cache: isLocal ? 'no-store' : 'default' });
       if (res.ok) return (await res.json()).filter(item => item.type !== 'spacer').length;
     } catch { /* ignore */ }
     return 0;
@@ -467,7 +467,7 @@
   async function loadRolesFromJSON() {
     if (isLocal) return;
     try {
-      const res = await fetch('data/roles.json');
+      const res = await fetch('data/roles.json', { cache: isLocal ? 'no-store' : 'default' });
       if (res.ok) {
         const data = await res.json();
         if (data.roles && Array.isArray(data.roles)) {
