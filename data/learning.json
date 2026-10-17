@@ -109,7 +109,7 @@
   },
   {
     "id": "app_1792235661442",
-    "name": "全国高校入試板書ノート",
+    "name": "全国高校入試板書ノート数学",
     "url": "https://koukou-nyushi-sugaku-kaisetsu.vercel.app/",
     "caption": "",
     "tags": [
@@ -121,8 +121,8 @@
   },
   {
     "id": "app_1792235832150",
-    "name": "ブランク",
-    "url": "",
+    "name": "全国高校入試板書ノート理科",
+    "url": "https://koukou-nyushi-rika-kaisetsu.vercel.app/",
     "caption": "",
     "tags": []
   },
