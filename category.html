@@ -18,7 +18,7 @@
     <meta name="apple-mobile-web-app-title" content="ECC Apps" />
 
     <link rel="stylesheet" href="style.css?v=20260922-2" />
-    <link rel="stylesheet" href="category.css?v=20260922-2" />
+    <link rel="stylesheet" href="category.css?v=20261120-1" />
 </head>
 
 <body>
@@ -46,6 +46,8 @@
 
     <!-- Main Content -->
     <main class="main-content">
+        <div class="learning-tabs" id="learningTabs" role="tablist" aria-label="学習アプリの分類" hidden></div>
+
         <!-- Search Bar -->
         <div class="search-section" id="searchSection">
             <div class="search-bar">
@@ -84,6 +86,12 @@
                 <div class="modal-field">
                     <label for="inputAppCaption">キャプション（任意）</label>
                     <input type="text" id="inputAppCaption" placeholder="例: 日次出席管理用" />
+                </div>
+                <div class="modal-field" id="learningGroupField" hidden>
+                    <label for="inputLearningGroup">学習アプリの分類</label>
+                    <select id="inputLearningGroup">
+                        <option value="">自動分類</option>
+                    </select>
                 </div>
                 <div class="modal-field">
                     <label>タグ</label>
@@ -127,7 +135,7 @@
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <script src="category.js?v=20260922-2"></script>
+    <script src="category.js?v=20261120-1"></script>
 </body>
 
 </html>

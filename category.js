@@ -41,6 +41,14 @@
     const params = new URLSearchParams(window.location.search);
     const catId = params.get('cat') || 'counter';
     const storageKey = `lp_cat_${catId}_apps`;
+    const isLearning = catId === 'learning';
+    const LEARNING_GROUPS = new Map([
+        ['all', 'すべて'],
+        ['eiken', '英検'],
+        ['high-school', '高校生用'],
+        ['junior-high', '中学生用'],
+        ['other', 'その他']
+    ]);
 
     // ---------- Image Config ----------
     const MAX_IMG_WIDTH = 480;
@@ -54,6 +62,8 @@
     let currentTags = [];
     let searchQuery = '';
     let activeFilterTags = [];
+    let activeLearningGroup = 'all';
+    let gridRenderVersion = 0;
     const tagsStorageKey = `lp_cat_${catId}_registered_tags`;
 
     // ---------- DOM Elements ----------
@@ -78,6 +88,8 @@
     const searchInput = document.getElementById('searchInput');
     const searchClear = document.getElementById('searchClear');
     const tagFilterBar = document.getElementById('tagFilterBar');
+    const learningTabs = document.getElementById('learningTabs');
+    const inputLearningGroup = document.getElementById('inputLearningGroup');
     const tagListEl = document.getElementById('tagList');
     const inputTag = document.getElementById('inputTag');
     const btnAddTag = document.getElementById('btnAddTag');
@@ -215,9 +227,95 @@
         return [...s].sort();
     }
 
+    // ---------- Learning Tabs ----------
+    function getLearningGroup(app) {
+        if (app.learningGroup !== 'all' && LEARNING_GROUPS.has(app.learningGroup)) {
+            return app.learningGroup;
+        }
+        const tags = app.tags || [];
+        const name = app.name || '';
+        const highSchool = tags.includes('高校生') || tags.includes('大学受験');
+        const juniorHigh = tags.some(tag => ['中学生', '高校受験', '基礎学'].includes(tag));
+        if (/未就学|小学(生|高学年)/.test(name)) return 'other';
+        if (tags.includes('大学受験') && tags.includes('高校受験')) return 'other';
+        if (tags.includes('英検') || name.includes('英検')) return 'eiken';
+        if (highSchool && juniorHigh) return 'other';
+        if (highSchool || /大学.*英語|私立大英語|共通テスト/.test(name)) return 'high-school';
+        if (juniorHigh || /中学|高校入試|基礎学/.test(name)) return 'junior-high';
+        return 'other';
+    }
+
+    function getAppsInTab() {
+        if (!isLearning || activeLearningGroup === 'all') return apps;
+        return apps.filter(app => app.type !== 'spacer' && getLearningGroup(app) === activeLearningGroup);
+    }
+
+    function initLearningTabs() {
+        for (const [group, label] of LEARNING_GROUPS) {
+            const tab = document.createElement('button');
+            tab.type = 'button';
+            tab.id = `learning-tab-${group}`;
+            tab.className = 'learning-tab';
+            tab.dataset.group = group;
+            tab.setAttribute('role', 'tab');
+            tab.setAttribute('aria-controls', grid.id);
+            tab.textContent = label;
+            const count = document.createElement('span');
+            count.className = 'learning-tab-count';
+            tab.appendChild(count);
+            tab.addEventListener('click', () => {
+                if (group === activeLearningGroup) return;
+                activeLearningGroup = group;
+                activeFilterTags = [];
+                renderTagFilterBar();
+                renderGrid();
+            });
+            learningTabs.appendChild(tab);
+            if (group !== 'all') inputLearningGroup.add(new Option(label, group));
+        }
+
+        learningTabs.addEventListener('keydown', event => {
+            const tabs = [...learningTabs.children];
+            const index = tabs.indexOf(event.target);
+            let next;
+            switch (event.key) {
+                case 'ArrowRight': next = (index + 1) % tabs.length; break;
+                case 'ArrowLeft': next = (index - 1 + tabs.length) % tabs.length; break;
+                case 'Home': next = 0; break;
+                case 'End': next = tabs.length - 1; break;
+                default: return;
+            }
+            event.preventDefault();
+            tabs[next].focus();
+            tabs[next].click();
+        });
+        grid.setAttribute('role', 'tabpanel');
+        grid.tabIndex = 0;
+        learningTabs.hidden = false;
+        document.getElementById('learningGroupField').hidden = !isLocal;
+    }
+
+    function updateLearningTabs() {
+        const counts = { all: 0, eiken: 0, 'high-school': 0, 'junior-high': 0, other: 0 };
+        for (const app of apps) {
+            if (app.type === 'spacer') continue;
+            counts.all++;
+            counts[getLearningGroup(app)]++;
+        }
+        for (const tab of learningTabs.children) {
+            const { group } = tab.dataset;
+            const active = group === activeLearningGroup;
+            tab.setAttribute('aria-selected', String(active));
+            tab.setAttribute('aria-label', `${LEARNING_GROUPS.get(group)} ${counts[group]}件`);
+            tab.tabIndex = active ? 0 : -1;
+            tab.lastElementChild.textContent = counts[group];
+            if (active) grid.setAttribute('aria-labelledby', tab.id);
+        }
+    }
+
     // ---------- Search / Filter ----------
     function getFilteredApps() {
-        let list = apps;
+        let list = getAppsInTab();
         const q = searchQuery.toLowerCase().trim();
         if (q || activeFilterTags.length > 0) {
             list = list.filter(a => a.type !== 'spacer');
@@ -238,7 +336,11 @@
 
     function renderTagFilterBar() {
         tagFilterBar.innerHTML = '';
-        getAllUsedTags().forEach(tag => {
+        const tags = isLearning && activeLearningGroup !== 'all'
+            ? [...new Set(getAppsInTab().flatMap(app => app.tags || []))].sort()
+            : getAllUsedTags();
+        if (isLearning) activeFilterTags = activeFilterTags.filter(tag => tags.includes(tag));
+        tags.forEach(tag => {
             const btn = document.createElement('button');
             btn.className = 'tag-filter-btn' + (activeFilterTags.includes(tag) ? ' active' : '');
             btn.textContent = tag;
@@ -284,13 +386,17 @@
     }
 
     async function renderGrid() {
+        const version = ++gridRenderVersion;
+        if (isLearning) updateLearningTabs();
         grid.innerHTML = '';
         const filtered = getFilteredApps();
 
-        if (filtered.length === 0 && (searchQuery || activeFilterTags.length > 0)) {
+        if (filtered.length === 0 && (isLearning || searchQuery || activeFilterTags.length > 0)) {
             const d = document.createElement('div');
             d.className = 'no-results';
-            d.textContent = '該当するアプリが見つかりません';
+            d.textContent = searchQuery.trim() || activeFilterTags.length > 0
+                ? '該当するアプリが見つかりません'
+                : '登録されているアプリはありません';
             grid.appendChild(d);
         }
 
@@ -328,6 +434,7 @@
 
             // Load image from IndexedDB
             let imgSrc = app._hasImage ? await idbLoad(app.id) : null;
+            if (version !== gridRenderVersion) return;
             const imageHtml = imgSrc
                 ? `<img src="${imgSrc}" alt="${app.name}" loading="lazy" />`
                 : `<span class="no-image">📷</span>`;
@@ -373,6 +480,7 @@
             ac.addEventListener('click', () => openModal());
             grid.appendChild(ac);
 
+            if (isLearning && activeLearningGroup !== 'all') return;
             const spacerCard = document.createElement('div');
             spacerCard.className = 'add-app-card add-spacer-card';
             spacerCard.innerHTML = `<span class="plus-icon">□</span> 空白グリッド追加 <small>PC表示用</small>`;
@@ -454,6 +562,7 @@
             inputName.value = app.name;
             inputUrl.value = app.url || '';
             inputCaption.value = app.caption || '';
+            if (isLearning) inputLearningGroup.value = app.learningGroup || '';
             currentTags = [...(app.tags || [])];
             let imgSrc = app._hasImage ? await idbLoad(app.id) : null;
             if (imgSrc) {
@@ -465,6 +574,7 @@
         } else {
             modalTitle.textContent = 'アプリ登録';
             form.reset(); resetImagePreview();
+            if (isLearning && activeLearningGroup !== 'all') inputLearningGroup.value = activeLearningGroup;
         }
         renderModalTags(); renderTagSuggestions();
         modal.classList.add('active');
@@ -510,9 +620,12 @@
     // ---------- CRUD ----------
     async function addApp(data) {
         const id = 'app_' + Date.now();
-        apps.unshift({ id, name: data.name, url: data.url, caption: data.caption, tags: data.tags || [], _hasImage: !!data.image });
+        const app = { id, name: data.name, url: data.url, caption: data.caption, tags: data.tags || [], _hasImage: !!data.image };
+        if (data.learningGroup) app.learningGroup = data.learningGroup;
+        apps.unshift(app);
         saveApps();
         if (data.image) await idbSave(id, data.image);
+        renderTagFilterBar();
         await renderGrid();
         showToast(`「${data.name}」を登録しました`);
     }
@@ -528,8 +641,13 @@
         const idx = apps.findIndex(a => a.id === appId);
         if (idx === -1) return;
         apps[idx] = { ...apps[idx], name: data.name, url: data.url, caption: data.caption, tags: data.tags || [], _hasImage: !!data.image || apps[idx]._hasImage };
+        if (isLearning) {
+            if (data.learningGroup) apps[idx].learningGroup = data.learningGroup;
+            else delete apps[idx].learningGroup;
+        }
         saveApps();
         if (data.image) await idbSave(appId, data.image);
+        renderTagFilterBar();
         await renderGrid();
         showToast(`「${data.name}」を更新しました`);
     }
@@ -542,6 +660,7 @@
         apps = apps.filter(a => a.id !== appId);
         saveApps();
         await idbDelete(appId);
+        if (isLearning) renderTagFilterBar();
         await renderGrid();
         showToast(`${label}を削除しました`);
     }
@@ -567,9 +686,10 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const data = { name: inputName.value.trim(), url: inputUrl.value.trim(), caption: inputCaption.value.trim(), image: currentImageData, tags: [...currentTags] };
+            if (isLearning) data.learningGroup = inputLearningGroup.value;
             if (!data.name) return;
             if (editingAppId) await updateApp(editingAppId, data); else await addApp(data);
-            closeModal(); renderTagFilterBar();
+            closeModal();
         });
 
         btnAddTag.addEventListener('click', addTagFromInput);
@@ -638,6 +758,7 @@
                 caption: app.caption || '',
                 tags: app.tags || []
             };
+            if (isLearning && app.learningGroup) entry.learningGroup = app.learningGroup;
             // Get image from IndexedDB
             if (app._hasImage) {
                 const imgData = await idbLoad(app.id);
@@ -705,6 +826,7 @@
             }
         }
 
+        if (isLearning) initLearningTabs();
         renderTagFilterBar();
         await renderGrid();
         createParticles();
